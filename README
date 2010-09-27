@@ -7,3 +7,11 @@ For a full sample see:
 
 http://trac.webkit.org/export/66389/trunk/LayoutTests/fast/speech/input-appearance-speechbutton.html
 
+* NOTE: The Context Menu API *
+
+I was shocked that the context menu API in Chrome (http://code.google.com/chrome/extensions/beta/contextMenus.html as of Sept 27th 2010) didn't pass you the DOM element of the editable element.
+
+Fortunately, antimatter15 (he is 15!) had the nice hack:
+
+http://antimatter15.com/wp/2010/08/chrome-extension-hide-element/
+http://github.com/antimatter15/hideelements
