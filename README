@@ -1,0 +1,9 @@
+Speak to Site
+-------------
+
+A chrome extension that allows you to use a context menu drop down on any editable input (input, textarea, etc) to flip the "speech" attribute which tells the browser that you can do speech-to-text conversion.
+
+For a full sample see:
+
+http://trac.webkit.org/export/66389/trunk/LayoutTests/fast/speech/input-appearance-speechbutton.html
+
