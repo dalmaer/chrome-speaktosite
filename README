@@ -15,3 +15,86 @@ Fortunately, antimatter15 (he is 15!) had the nice hack:
 
 http://antimatter15.com/wp/2010/08/chrome-extension-hide-element/
 http://github.com/antimatter15/hideelements
+http://code.google.com/p/chromium/issues/detail?id=39507
+http://jsconfeu2010-pi.appspot.com/
+
+--
+
+Chrome Speak To Site; Give any input the power to listen to you
+
+<a href="http://paulirish.com/">Paul Irish</a> gave a fantastic updated <a href="http://jsconfeu2010-pi.appspot.com/">State of HTML5</a> talk at JSConf.EU. It is packed full of demos, including sharks with freaking lazer beams!
+
+At one point he showed off the <a href="http://trac.webkit.org/export/66389/trunk/LayoutTests/fast/speech/input-appearance-speechbutton.html">WebKit support for &lt;input speech&gt;</a> implementation that allows you to talk into an input area. You click on the microphone, speak in, and it will get translated for you with the results. I am not sure if you can tweak how the translation is done (choose a Nuance vs. Google vs. .... solution for example), but it definitely works well out of the box.
+
+[]
+
+I was surprised to see this already landed in my developer-channel Chrome, so I was incented to do something with it on the plane trip back from Berlin to New York City. Something simple would be to give the user the ability to enable speech on any input. I whipped up a Chrome extension using the <a href="http://code.google.com/chrome/extensions/beta/contextMenus.html">context menu API</a>, but was quickly surprised to see that there isn't <a href="http://code.google.com/p/chromium/issues/detail?id=39507">support in the API to get the DOM node that you are working on</a>. Huh. Kinda crazy in fact.
+
+Then the whizzkid <a href="http://antimatter15.com/wp/2010/08/chrome-extension-hide-element/">antimatter came to the rescue</a> with his cheeky little hack around the system. Here is how it plays out in the world of this extension:
+
+<b>The background page</b>
+
+First we enable the context menu on any "editable" element (vs. anywhere on the page, on any text, etc), and when clicked we fire off an event to the content script in the given tab:
+
+<pre lang="html">
+<script>
+chrome.contextMenus.create({
+    title: "Turn on speech input",
+    contexts: ["editable"],
+    onclick: function(info, tab) {
+        chrome.tabs.sendRequest(tab.id, 'letmespeak')
+    }
+});
+</script>
+</pre>
+
+<b>Catching in a content script</b>
+
+A content script then does two things:
+
+<ul>
+<li>Listens for mousedown events to keep resetting the last element in focus
+<li>Catches the event, and turns on the speech attribute on the target DOM node
+</ul>
+
+<pre lang="html">
+var last_target = null;
+document.addEventListener('mousedown', function(event) {
+    last_target = event.target;
+}, true);
+
+chrome.extension.onRequest.addListener(function(event) {
+    last_target.setAttribute("speech", "on");
+    last_target = null;
+})
+</pre>
+
+<b>Wire-y wire-y</b>
+
+Of course, it all gets wired up in the manifest:
+
+<pre lang="javascript">
+{
+    "name": "Turn on Speech Input",
+    "description": "Turns on the speech attribute, allows you to speak into an input",
+    "version": "0.1",
+    "permissions": ["contextMenus"],
+    "minimum_chrome_version": "6",
+    "background_page": "background.html",
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["input-speech.js"]
+    }]
+}
+</pre>
+
+This trivial extension is <a href="http://github.com/dalmaer/chrome-speaktosite">of course on GitHub</a> (I want <a href="http://thechangelog.com/post/1200486354/git-achievements-aquire-achievements-while-using-git">git-achivements</a> after all! :).
+
+A couple of things trouble me though:
+
+<ul>
+<li>The microphone icon should sit on the right of the input, however when dynamically tweaked like this it shows up on the left by mistake [BUG]
+<li>I have also played with extensions such as <a href="https://chrome.google.com/extensions/detail/jlhhbmloafbaonaondjcedenomeeggda">Google Scribe</a>. Adding icons like this doesn't scale. Having them show up all the time gets in my way. I think I want one ability to popup special powers like scribe completion, or speech-to-text, without it getting in my way.
+</ul>
+
+You?

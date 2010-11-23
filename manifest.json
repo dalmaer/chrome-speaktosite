@@ -1,7 +1,7 @@
 {
     "name": "Turn on Speech Input",
     "description": "Turns on the speech attribute, allows you to speak into an input",
-    "version": "0.1",
+    "version": "0.2",
     "permissions": ["contextMenus"],
     "minimum_chrome_version": "6",
     "background_page": "background.html",
